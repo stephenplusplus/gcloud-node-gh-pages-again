@@ -168,7 +168,7 @@
     "ignore": false,
     "line": 38,
     "codeStart": 46,
-    "code": "Change.prototype.getMetadata = function(callback) {\n  var self = this;\n  var path = '/managedZones/' + this.zoneName + '/changes/' + this.id;\n\n  this.makeReq_('GET', path, null, true, function(err, resp) {\n    if (err) {\n      callback(err, null, resp);\n      return;\n    }\n\n    self.metadata = resp;\n\n    callback(null, self.metadata, resp);\n  });\n};\n\nmodule.exports = Change;",
+    "code": "Change.prototype.getMetadata = function(callback) {\n  var self = this;\n  var path = '/managedZones/' + this.zoneName + '/changes/' + this.id;\n\n  this.makeReq_('GET', path, null, null, function(err, resp) {\n    if (err) {\n      callback(err, null, resp);\n      return;\n    }\n\n    self.metadata = resp;\n\n    callback(null, self.metadata, resp);\n  });\n};\n\nmodule.exports = Change;",
     "ctx": {
       "type": "method",
       "constructor": "Change",

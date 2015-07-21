@@ -263,7 +263,7 @@
     "ignore": false,
     "line": 76,
     "codeStart": 87,
-    "code": "Record.fromZoneRecord_ = function(zone, type, bindData) {\n  var typeToBindFormat = {\n    a: '{ip}',\n    aaaa: '{ip}',\n    cname: '{alias}',\n    mx: '{preference} {host}',\n    ns: '{host}',\n    txt: '{txt}',\n    soa: '{mname} {rname} {serial} {retry} {refresh} {expire} {minimum}',\n    spf: '{data}',\n    srv: '{priority} {weight} {port} {target}',\n  };\n\n  var metadata = {\n    data: util.format(typeToBindFormat[type.toLowerCase()], bindData),\n    name: bindData.name,\n    ttl: bindData.ttl\n  };\n\n  return new Record(zone, type, metadata);\n};",
+    "code": "Record.fromZoneRecord_ = function(zone, type, bindData) {\n  var typeToZoneFormat = {\n    a: '{ip}',\n    aaaa: '{ip}',\n    cname: '{alias}',\n    mx: '{preference} {host}',\n    ns: '{host}',\n    soa: '{mname} {rname} {serial} {retry} {refresh} {expire} {minimum}',\n    spf: '{data}',\n    srv: '{priority} {weight} {port} {target}',\n    txt: '{txt}'\n  };\n\n  var metadata = {\n    data: util.format(typeToZoneFormat[type.toLowerCase()], bindData),\n    name: bindData.name,\n    ttl: bindData.ttl\n  };\n\n  return new Record(zone, type, metadata);\n};",
     "ctx": {
       "type": "method",
       "receiver": "Record",
@@ -389,6 +389,12 @@
   {
     "tags": [
       {
+        "type": "private",
+        "string": "\n",
+        "visibility": "private",
+        "html": ""
+      },
+      {
         "type": "return",
         "string": "{string}",
         "types": [
@@ -408,14 +414,14 @@
       "summary": "<p>Convert the record to a string, formatted for a zone file.</p>",
       "body": ""
     },
-    "isPrivate": false,
+    "isPrivate": true,
     "isConstructor": false,
     "isClass": false,
     "isEvent": false,
     "ignore": false,
     "line": 151,
-    "codeStart": 156,
-    "code": "Record.prototype.toString = function() {\n  var json = this.toJSON();\n\n  return (json.rrdatas || [{}]).map(function(data) {\n    json.line = data;\n    return util.format('{name} {ttl} IN {type} {line}', json);\n  }).join('\\n');\n};\n\nmodule.exports = Record;",
+    "codeStart": 158,
+    "code": "Record.prototype.toString = function() {\n  var json = this.toJSON();\n\n  return (json.rrdatas || [{}]).map(function(data) {\n    json.rrdata = data;\n    return util.format('{name} {ttl} IN {type} {rrdata}', json);\n  }).join('\\n');\n};\n\nmodule.exports = Record;",
     "ctx": {
       "type": "method",
       "constructor": "Record",

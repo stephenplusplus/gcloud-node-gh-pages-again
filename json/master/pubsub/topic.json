@@ -477,8 +477,8 @@
       },
       {
         "type": "example",
-        "string": "var callback = function(err, subscriptions, nextQuery, apiResponse) {\n  // If `nextQuery` is non-null, there may be more results to fetch. To do\n  // so, run `topic.getSubscriptions(nextQuery, callback);`.\n};\n\n// Get all subscriptions for this topic.\ntopic.getSubscriptions(callback);\n\n// Customize the query.\ntopic.getSubscriptions({\n  pageSize: 3\n}, callback);",
-        "html": "<p>var callback = function(err, subscriptions, nextQuery, apiResponse) {<br />  // If <code>nextQuery</code> is non-null, there may be more results to fetch. To do<br />  // so, run <code>topic.getSubscriptions(nextQuery, callback);</code>.<br />};</p><p>// Get all subscriptions for this topic.<br />topic.getSubscriptions(callback);</p><p>// Customize the query.<br />topic.getSubscriptions({<br />  pageSize: 3<br />}, callback);</p>"
+        "string": "var callback = function(err, subscriptions, nextQuery, apiResponse) {\n  // If `nextQuery` is non-null, there may be more results to fetch. To do\n  // so, run `topic.getSubscriptions(nextQuery, callback);`.\n};\n\n// Get all subscriptions for this topic.\ntopic.getSubscriptions(callback);\n\n// Customize the query.\ntopic.getSubscriptions({\n  pageSize: 3\n}, callback);\n\n//-\n// Get the subscriptions for this topic as a readable object stream.\n//-\ntopic.getSubscriptions()\n  .on('error', console.error)\n  .on('data', function(subscription) {\n    // subscription is a Subscription object.\n  })\n  .on('end', function() {\n    // All subscriptions retrieved.\n  });\n\n//-\n// If you anticipate many results, you can end a stream early to prevent\n// unnecessary processing and API requests.\n//-\ntopic.getSubscriptions()\n  .on('data', function(subscription) {\n    this.end();\n  });",
+        "html": "<p>var callback = function(err, subscriptions, nextQuery, apiResponse) {<br />  // If <code>nextQuery</code> is non-null, there may be more results to fetch. To do<br />  // so, run <code>topic.getSubscriptions(nextQuery, callback);</code>.<br />};</p><p>// Get all subscriptions for this topic.<br />topic.getSubscriptions(callback);</p><p>// Customize the query.<br />topic.getSubscriptions({<br />  pageSize: 3<br />}, callback);</p><p>//-<br />// Get the subscriptions for this topic as a readable object stream.<br />//-<br />topic.getSubscriptions()<br />  .on(&#39;error&#39;, console.error)<br />  .on(&#39;data&#39;, function(subscription) {<br />    // subscription is a Subscription object.<br />  })<br />  .on(&#39;end&#39;, function() {<br />    // All subscriptions retrieved.<br />  });</p><p>//-<br />// If you anticipate many results, you can end a stream early to prevent<br />// unnecessary processing and API requests.<br />//-<br />topic.getSubscriptions()<br />  .on(&#39;data&#39;, function(subscription) {<br />    this.end();<br />  });</p>"
       }
     ],
     "description": {
@@ -492,8 +492,8 @@
     "isEvent": false,
     "ignore": false,
     "line": 184,
-    "codeStart": 210,
-    "code": "Topic.prototype.getSubscriptions = function(options, callback) {\n  if (!callback) {\n    callback = options;\n    options = {};\n  }\n\n  options = options || {};\n  options.topic = this;\n\n  this.pubsub.getSubscriptions(options, callback);\n};",
+    "codeStart": 231,
+    "code": "Topic.prototype.getSubscriptions = function(options, callback) {\n  if (util.is(options, 'function')) {\n    callback = options;\n    options = {};\n  }\n\n  options = options || {};\n  options.topic = this;\n\n  return this.pubsub.getSubscriptions(options, callback);\n};",
     "ctx": {
       "type": "method",
       "constructor": "Topic",
@@ -618,8 +618,8 @@
     "isClass": false,
     "isEvent": false,
     "ignore": false,
-    "line": 222,
-    "codeStart": 254,
+    "line": 243,
+    "codeStart": 275,
     "code": "Topic.prototype.subscribe = function(subName, options, callback) {\n  this.pubsub.subscribe(this, subName, options, callback);\n};",
     "ctx": {
       "type": "method",
@@ -717,8 +717,8 @@
     "isClass": false,
     "isEvent": false,
     "ignore": false,
-    "line": 258,
-    "codeStart": 283,
+    "line": 279,
+    "codeStart": 304,
     "code": "Topic.prototype.subscription = function(name, options) {\n  return this.pubsub.subscription(name, options);\n};",
     "ctx": {
       "type": "method",
@@ -813,8 +813,8 @@
     "isClass": false,
     "isEvent": false,
     "ignore": false,
-    "line": 287,
-    "codeStart": 300,
+    "line": 308,
+    "codeStart": 321,
     "code": "Topic.prototype.makeReq_ = function(method, path, query, body, callback) {\n  var self = this;\n\n  function createTopicThenRetryRequest() {\n    self.pubsub.createTopic(self.unformattedName, function(err, topic, res) {\n      if (err) {\n        callback(err, null, res);\n        return;\n      }\n\n      self.pubsub.makeReq_(method, path, query, body, callback);\n    });\n  }\n\n  this.pubsub.makeReq_(method, path, query, body, function(err, res) {\n    if (self.autoCreate && err && err.code === 404 && method !== 'DELETE') {\n      createTopicThenRetryRequest();\n    } else {\n      callback(err, res);\n    }\n  });\n};\n\nmodule.exports = Topic;",
     "ctx": {
       "type": "method",
